@@ -9,10 +9,19 @@ optional_fiz = {'Осуществление автоплатежей': False, '�
                 'Страхование движимого имущества': False,
                 'Страхование путешественников': False, 'Страхование пассажиров': False,
                 'Наличие мобильного приложения': False, 'Открытие брокерского счета': False}
+
 ranked_fiz = {'Переводы на карту': 0, 'Минимальная сумма вклада': 0, 'Процент по вкладу ': 0, 'Сумма кредита': 0,
               'Ставка кредита': 0, 'Переводы на карты по номеру телефона': 0}
 ranked_biz = {'Стоимость обслуживания': 0, '% за снятие наличных': 0, '% за внесение наличных': 0,
               'Лимит перевода на карту физ.лица': 0}
+
+ranked_fiz_less = {'Минимальная сумма вклада': ranked_fiz['Минимальная сумма вклада'],
+                    'Ставка кредита': ranked_fiz['Ставка кредита']}
+ranked_biz_less = {'Стоимость обслуживания': ranked_biz['Стоимость обслуживания'],
+                   '% за снятие наличных':ranked_biz['% за снятие наличных'],
+                   '% за внесение наличных':ranked_biz['% за внесение наличных']}
+
+
 banks = []
 
 
@@ -21,14 +30,11 @@ def choose_necessary(kind):
         colums = [x for x in list(optional_biz.keys()) if optional_fiz[x]]
         data_optional = pd.read_csv(r'biz.csv')
     else:
-        #print()
         colums = [x for x in list(optional_fiz.keys()) if not optional_fiz[x]]
         data_optional = pd.read_excel(r'fiz.xlsx', encoding = "utf-8")
-    #print(list(data_optional))
-   # print(colums)
+
     for i in colums:
         tmp = data_optional[i].values.tolist()
-      #  print(i)
         for j in range(len(tmp)):
             name = data_optional['названия'].values.tolist()[j]
             if tmp[j] == 1:
@@ -36,37 +42,37 @@ def choose_necessary(kind):
             else:
                 if name in banks:
                     banks.remove(name)
-   # print(banks)
 
+
+def rank_to_more(a, b):
+    return a >= b
+
+def rank_to_less(a, b):
+    return a <= b
 
 
 def choose_ranked(kind):
     data_ranked = pd.read_excel(r'both.xlsx', encoding="utf-8")
     if kind == 'biz':
         colums = list(ranked_biz.keys())
-        for i in colums:
-            tmp = data_ranked[i].values.tolist()
-            for j in range(len(tmp)):
-                name = data_ranked['названия'].values.tolist()[j]
-                if tmp[j] >= ranked_fiz[i]:
-                    banks.append(name)
-                else:
-                    if name in banks:
-                        banks.remove(name)
+
     else:
         colums = list(ranked_fiz.keys())
-        #print(colums)
-        #print(data_ranked['Процент по вкладу '])
-        for i in colums:
-           # print(i)
-            tmp = data_ranked[i].values.tolist()
-            for j in range(len(tmp)):
-                name = data_ranked['названия'].values.tolist()[j]
-                if tmp[j] <= ranked_fiz[i]:
-                    banks.append(name)
-                else:
-                    if name in banks:
-                        banks.remove(name)
+
+    for i in colums:
+        tmp = data_ranked[i].values.tolist()
+        for j in range(len(tmp)):
+            name = data_ranked['названия'].values.tolist()[j]
+            if (i in ranked_biz_less) | (i in ranked_fiz_less):
+                logic = rank_to_less(tmp[j], ranked_fiz[i])
+            else:
+                logic = rank_to_more(tmp[j], ranked_fiz[i])
+
+            if logic:
+                banks.append(name)
+            else:
+                if name in banks:
+                    banks.remove(name)
 
 
 
