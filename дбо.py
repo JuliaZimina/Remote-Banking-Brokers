@@ -30,7 +30,7 @@ def choose_necessary(kind):
         colums = [x for x in list(optional_biz.keys()) if optional_fiz[x]]
         data_optional = pd.read_csv(r'biz.csv')
     else:
-        colums = [x for x in list(optional_fiz.keys()) if not optional_fiz[x]]
+        colums = [x for x in list(optional_fiz.keys()) if  optional_fiz[x]]
         data_optional = pd.read_excel(r'fiz.xlsx', encoding = "utf-8")
 
     for i in colums:
