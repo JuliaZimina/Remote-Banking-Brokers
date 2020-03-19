@@ -23,28 +23,32 @@ ranked_biz_less = {'Стоимость обслуживания': ranked_biz['С
 
 banks = []
 
+black_list = []
 
 def choose_necessary(kind):
     if kind == 'biz':
         colums = [x for x in list(optional_biz.keys()) if optional_fiz[x]]
         data_optional = pd.read_csv(r'biz.csv')
     else:
-        #print()
-        colums = [x for x in list(optional_fiz.keys()) if optional_fiz[x]]
+        colums = [x for x in list(optional_fiz.keys()) if not optional_fiz[x]]
+
         data_optional = pd.read_excel(r'fiz.xlsx', encoding = "utf-8")
-    #print(list(data_optional))
-   # print(colums)
+
     for i in colums:
         tmp = data_optional[i].values.tolist()
-      #  print(i)
         for j in range(len(tmp)):
             name = data_optional['названия'].values.tolist()[j]
             if tmp[j] == 1:
-                banks.append(name)
+                if (name not in banks) & (name not in black_list):
+                    banks.append(name)
             else:
                 if name in banks:
-                    banks.remove(name)
-   # print(banks)
+                    black_list.append(name)
+
+    for i in black_list:
+        if i in banks:
+            banks.remove(i)
+
 
 
 
@@ -56,6 +60,7 @@ def rank_to_less(a, b):
 
 
 def choose_ranked(kind):
+
     data_ranked = pd.read_excel(r'both.xlsx', encoding="utf-8")
     if kind == 'biz':
         colums = list(ranked_biz.keys())
@@ -73,30 +78,39 @@ def choose_ranked(kind):
                 logic = rank_to_more(tmp[j], ranked_fiz[i])
 
             if logic:
-                banks.append(name)
+                if (name not in banks) & (name not in black_list):
+                    banks.append(name)
             else:
                 if name in banks:
-                    banks.remove(name)
+                    black_list.append(name)
+
+    for i in black_list:
+        if i in banks:
+            banks.remove(i)
+
+
 
 
 def t_sort(data, column, rev):
     result = {}
-    per = data[column].values.tolist()
-    sort_per = list(dict(zip(banks, per)).items())
+    if len(banks) > 0:
 
-    sort_per.sort(key=lambda i: i[1], reverse=rev)
-    print(sort_per)
-    list_per = [x[0] for x in sort_per]
-    rank = 1
-    same = [list_per[0]]
-    for i in range(1, len(list_per)):
-        if sort_per[i][1] == sort_per[i - 1][1]:
-            same.append(list_per[i])
-        else:
-            result[rank] = same
-            rank += 1
-            same = [list_per[i]]
-    result[rank] = same
+        per = data[column].values.tolist()
+        sort_per = list(dict(zip(banks, per)).items())
+
+        sort_per.sort(key=lambda i: i[1], reverse=rev)
+        print(sort_per)
+        list_per = [x[0] for x in sort_per]
+        rank = 1
+        same = [list_per[0]]
+        for i in range(1, len(list_per)):
+            if sort_per[i][1] == sort_per[i - 1][1]:
+                same.append(list_per[i])
+            else:
+                result[rank] = same
+                rank += 1
+                same = [list_per[i]]
+        result[rank] = same
     return result
 
 
@@ -118,7 +132,6 @@ def special_sort(kind_of_sort):
         result = t_sort(data, 'Место в рейтинге', True)
 
     return result
-
 choose_necessary('fiz')
 choose_ranked('fiz')
 
