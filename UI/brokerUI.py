@@ -19,6 +19,8 @@ class BrokerWin(Ui_MainWindow, QtWidgets.QMainWindow):
         self.selectAll_2.clicked.connect(self.selectAllBiz)
 
     def sendInputFiz(self):
+        banks.clear()
+        black_list.clear()
         optional_fiz['Осуществление автоплатежей'] = self.autoPayments.isChecked()
         optional_fiz['Перевод за рубеж'] = self.foreignTransfer.isChecked()
         optional_fiz['Создание автоперевода'] = self.createAutoPayments.isChecked()
@@ -50,7 +52,10 @@ class BrokerWin(Ui_MainWindow, QtWidgets.QMainWindow):
 
         # print(special_sort('По рейтингу'))
 
+
     def sendInputBiz(self):
+        banks.clear()
+        black_list.clear()
         optional_biz['Мобильное приложение'] = self.mobileApp_biz.isChecked()
         optional_biz['Торговый эквайринг'] = self.trade_biz.isChecked()
         optional_biz['Мобильный эквайринг'] = self.mobileTrade_biz.isChecked()
