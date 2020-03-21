@@ -2,9 +2,9 @@ from PyQt5.QtWidgets import QTableWidgetItem, QLabel, QFileDialog
 from PyQt5.QtCore import  Qt
 from pandas.tests.io.excel.test_xlrd import xlwt
 
-from UI.resultUI import *
+from UI.resultWinUI import *
 from algorithm import *
-from UI.mainUI import *
+from UI.mainWinUI import *
 
 
 class BrokerWin(Ui_MainWindow, QtWidgets.QMainWindow):
